@@ -3,7 +3,6 @@ package datasource
 
 import (
 	"fmt"
-	"log"
 
 	"github.com/hashicorp/hcl/v2/hcldec"
 	"github.com/hashicorp/packer-plugin-sdk/hcl2helper"
@@ -99,15 +98,17 @@ func (d *Datasource) Execute() (cty.Value, error) {
 	request := cvm.NewDescribeImagesRequest()
 
 	var filters []*cvm.Filter
-	// for key, value := range d.config.Filters {
-	filter := &cvm.Filter{
-		Name:   common.StringPtr("tag:registrar"),
-		Values: common.StringPtrs([]string{"namecheap"}),
+	for key, value := range d.config.Filters {
+		filter := &cvm.Filter{
+			Name:   common.StringPtr(key),
+			Values: common.StringPtrs([]string{value}),
+		}
+		filters = append(filters, filter)
 	}
-	filters = append(filters, filter)
-	// }
 	request.Filters = filters
 
+	// If the imageIds and instanceType inputs are null, it will cause an SDK error.
+	// Null/Empty checking
 	if len(d.config.ImageIds) > 0 {
 		request.ImageIds = common.StringPtrs(d.config.ImageIds)
 	}
@@ -116,6 +117,7 @@ func (d *Datasource) Execute() (cty.Value, error) {
 		request.InstanceType = common.StringPtr(d.config.InstanceType)
 	}
 
+	// Get Images
 	resp, err := client.DescribeImages(request)
 	if err != nil {
 		return cty.NullVal(cty.EmptyObject), err
@@ -128,7 +130,6 @@ func (d *Datasource) Execute() (cty.Value, error) {
 
 	var dataOutput DatasourceOutput
 	dataOutput.Images = filteredImages
-	log.Println("liang: ", dataOutput.Images)
 
 	return hcl2helper.HCL2ValueFromConfig(dataOutput, d.OutputSpec()), nil
 }
@@ -147,7 +148,6 @@ func getFilteredImage(resp *cvm.DescribeImagesResponse) (images []Image, err err
 			}
 			tags = append(tags, tag)
 		}
-		log.Println("liang: ", img.Tags)
 
 		images = append(images, Image{
 			ImageId:      *img.ImageId,

@@ -23,14 +23,12 @@ data "tencentcloud-images" "test_image" {
   secret_key = var.secret_key
   region  = var.region_id
   filters = {
-      // image-name =  "golden-image-v1-15-5"
-      // image-type = ["PRIVATE_IMAGE"]
-      // "tag-key" = "registrar"
-      // "tag-value" = "namecheap"
-      "tag:registrar" = "namecheap"
+      image-name = "golden-image-dev"
+      image-type = "PRIVATE_IMAGE"
+      "tag:registrar" = "namecheap" // tag:[key] = [value]
+      "tag:devops_project_kind" = "web-server" // tag:[key] = [value]
     }
-  // image_ids = ["img-altiyjog","img-1az6pxke","img-its3np62"]
-  // instance_type = "S1.SMALL1"
+  instance_type = "S1.SMALL1"
 }
 
 source "null" "basic-example" {
@@ -42,22 +40,7 @@ build {
 
   provisioner "shell-local" {
     inline = [
-      // "echo image_id: ${data.tencentcloud-images.test_image.images[0].image_id}",
-      "echo image_id: ${local.prodImageID[0]}",
+      "echo image_id: ${data.tencentcloud-images.test_image.images[0].image_id}",
     ]
-
   }
-}
-
-locals {
-  prodImageID = compact(flatten([for v in data.tencentcloud-images.test_image.images :
-     v.tags != null ? [for tag in v.tags :
-     tag.key == "registrar" && tag.value == "namecheap"? v.image_id : null ] : []
-    ]))
-
-//   devImageID = compact(flatten([for v in data.tencentcloud-images.test_image.images : [
-//     v.tags != null ? [for tag in v.tags : (
-//      tag.key == "registrar" && tag.value == "namecheap")? v.image_id : null
-//  ]
-//   ]]))
 }
