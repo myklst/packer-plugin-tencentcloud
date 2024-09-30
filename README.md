@@ -17,7 +17,8 @@ ImageIds and Filters cannot be specified at the same time.*
 |    Name      | Type          | Description                                                                                            |
 |--------------|---------------|--------------------------------------------------------------------------------------------------------|
 |image_ids     | list of string        | list of ID of the image.                                                                                       |
-|filters       | map of string | <pre>image_id   = "img-tes1r4" <br>image-type = "PRIVATE_IMAGE" <br>image-name = "webserver"<br>platform   = "CentOS" <br>tag-key    = "env" <br>tag-value  = "prod" <br>tag:env    = "prod" // tag:[key] = "value"</pre>|
+|image_name_regex | string        | Regex that is used to query image by name.                                                                                       |
+|filters       | map of string | <pre>image_id   = "img-tes1r4" <br>image-type = "PRIVATE_IMAGE" <br>image-name = "webserver" // full image name<br>platform   = "CentOS" <br>tag-key    = "env" <br>tag-value  = "prod" <br>tag:env    = "prod" // tag:[key] = "value"</pre>|
 |instance_type | string        | Instance type, `e.g. S1.SMALL1`                                                                                  |
 
 
@@ -38,17 +39,20 @@ packer {
   }
 }
 
+// Example inputs
+
 data "st-tencentcloud-images" "test_image" {
   secret_id  = "v1-gastisthisisnotmyaccesskey"
   secret_key = "v9-adftthisfathisisnotmysecretkey"
   region  = "cn-hongkong"
+  image_name_regex = "^TencentOS\\s+Server\\s+\\d+\\.\\d+\\s+\\(TK4\\)$"
   // image_ids = ["img-altiyjog","img-1az6pxke","img-its3np62"]
   filters = {
       "image-name"    = "img-5566"
       "image-type"    = "PRIVATE_IMAGE"
       "tag-key"       = "registrar"
       "tag-value"     = "namecheap"
-      "tag:registrar" = "namecheap"
+      "tag:registrar" = "namecheap" // tag:[key] = "value"
     }
   instance_type = "S1.SMALL1"
 }

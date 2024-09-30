@@ -10,12 +10,13 @@ import (
 // FlatConfig is an auto-generated flat version of Config.
 // Where the contents of a field with a `mapstructure:,squash` tag are bubbled up.
 type FlatConfig struct {
-	SecretId     *string           `mapstructure:"secret_id" required:"true" cty:"secret_id" hcl:"secret_id"`
-	SecretKey    *string           `mapstructure:"secret_key" required:"true" cty:"secret_key" hcl:"secret_key"`
-	Region       *string           `mapstructure:"region" required:"true" cty:"region" hcl:"region"`
-	ImageIds     []string          `mapstructure:"image_ids" cty:"image_ids" hcl:"image_ids"`
-	Filters      map[string]string `mapstructure:"filters" cty:"filters" hcl:"filters"`
-	InstanceType *string           `mapstructure:"instance_type" cty:"instance_type" hcl:"instance_type"`
+	SecretId       *string           `mapstructure:"secret_id" required:"true" cty:"secret_id" hcl:"secret_id"`
+	SecretKey      *string           `mapstructure:"secret_key" required:"true" cty:"secret_key" hcl:"secret_key"`
+	Region         *string           `mapstructure:"region" required:"true" cty:"region" hcl:"region"`
+	ImageIds       []string          `mapstructure:"image_ids" cty:"image_ids" hcl:"image_ids"`
+	ImageNameRegex *string           `mapstructure:"image_name_regex" cty:"image_name_regex" hcl:"image_name_regex"`
+	Filters        map[string]string `mapstructure:"filters" cty:"filters" hcl:"filters"`
+	InstanceType   *string           `mapstructure:"instance_type" cty:"instance_type" hcl:"instance_type"`
 }
 
 // FlatMapstructure returns a new FlatConfig.
@@ -30,12 +31,13 @@ func (*Config) FlatMapstructure() interface{ HCL2Spec() map[string]hcldec.Spec }
 // The decoded values from this spec will then be applied to a FlatConfig.
 func (*FlatConfig) HCL2Spec() map[string]hcldec.Spec {
 	s := map[string]hcldec.Spec{
-		"secret_id":     &hcldec.AttrSpec{Name: "secret_id", Type: cty.String, Required: false},
-		"secret_key":    &hcldec.AttrSpec{Name: "secret_key", Type: cty.String, Required: false},
-		"region":        &hcldec.AttrSpec{Name: "region", Type: cty.String, Required: false},
-		"image_ids":     &hcldec.AttrSpec{Name: "image_ids", Type: cty.List(cty.String), Required: false},
-		"filters":       &hcldec.AttrSpec{Name: "filters", Type: cty.Map(cty.String), Required: false},
-		"instance_type": &hcldec.AttrSpec{Name: "instance_type", Type: cty.String, Required: false},
+		"secret_id":        &hcldec.AttrSpec{Name: "secret_id", Type: cty.String, Required: false},
+		"secret_key":       &hcldec.AttrSpec{Name: "secret_key", Type: cty.String, Required: false},
+		"region":           &hcldec.AttrSpec{Name: "region", Type: cty.String, Required: false},
+		"image_ids":        &hcldec.AttrSpec{Name: "image_ids", Type: cty.List(cty.String), Required: false},
+		"image_name_regex": &hcldec.AttrSpec{Name: "image_name_regex", Type: cty.String, Required: false},
+		"filters":          &hcldec.AttrSpec{Name: "filters", Type: cty.Map(cty.String), Required: false},
+		"instance_type":    &hcldec.AttrSpec{Name: "instance_type", Type: cty.String, Required: false},
 	}
 	return s
 }

@@ -3,6 +3,7 @@ package datasource
 
 import (
 	"fmt"
+	"regexp"
 
 	"github.com/hashicorp/hcl/v2/hcldec"
 	"github.com/hashicorp/packer-plugin-sdk/hcl2helper"
@@ -20,12 +21,13 @@ type Datasource struct {
 }
 
 type Config struct {
-	SecretId     string            `mapstructure:"secret_id" required:"true"`
-	SecretKey    string            `mapstructure:"secret_key" required:"true"`
-	Region       string            `mapstructure:"region" required:"true"`
-	ImageIds     []string          `mapstructure:"image_ids"`
-	Filters      map[string]string `mapstructure:"filters"`
-	InstanceType string            `mapstructure:"instance_type"`
+	SecretId       string            `mapstructure:"secret_id" required:"true"`
+	SecretKey      string            `mapstructure:"secret_key" required:"true"`
+	Region         string            `mapstructure:"region" required:"true"`
+	ImageIds       []string          `mapstructure:"image_ids"`
+	ImageNameRegex string            `mapstructure:"image_name_regex"`
+	Filters        map[string]string `mapstructure:"filters"`
+	InstanceType   string            `mapstructure:"instance_type"`
 }
 
 type DatasourceOutput struct {
@@ -123,7 +125,7 @@ func (d *Datasource) Execute() (cty.Value, error) {
 		return cty.NullVal(cty.EmptyObject), err
 	}
 
-	filteredImages, err := getFilteredImage(resp)
+	filteredImages, err := getFilteredImage(d, resp)
 	if err != nil {
 		return cty.NullVal(cty.EmptyObject), err
 	}
@@ -134,12 +136,23 @@ func (d *Datasource) Execute() (cty.Value, error) {
 	return hcl2helper.HCL2ValueFromConfig(dataOutput, d.OutputSpec()), nil
 }
 
-func getFilteredImage(resp *cvm.DescribeImagesResponse) (images []Image, err error) {
+func getFilteredImage(d *Datasource, resp *cvm.DescribeImagesResponse) (images []Image, err error) {
 	if *resp.Response.TotalCount == 0 {
 		return images, fmt.Errorf("no image found matching the filters")
 	}
 
 	for _, img := range resp.Response.ImageSet {
+		// check if image name's regex is specified
+		if d.config.ImageNameRegex != "" {
+			imageNameRegex, err := regexp.Compile(d.config.ImageNameRegex)
+			if err != nil {
+				return images, err
+			}
+			if !imageNameRegex.MatchString(*img.ImageName) {
+				continue
+			}
+		}
+
 		var tags []Tag
 		for _, imgTag := range img.Tags {
 			tag := Tag{

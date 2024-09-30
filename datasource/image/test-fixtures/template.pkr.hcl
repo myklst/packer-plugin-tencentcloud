@@ -22,13 +22,11 @@ data "tencentcloud-images" "test_image" {
   secret_id = var.secret_id
   secret_key = var.secret_key
   region  = var.region_id
+
   filters = {
-      image-name = "golden-image-dev"
-      image-type = "PRIVATE_IMAGE"
-      "tag:registrar" = "namecheap" // tag:[key] = [value]
-      "tag:devops_project_kind" = "web-server" // tag:[key] = [value]
+      image-name = "TencentOS Server 3.1 (TK4)"
+      image-type = "PUBLIC_IMAGE"
     }
-  instance_type = "S1.SMALL1"
 }
 
 source "null" "basic-example" {
