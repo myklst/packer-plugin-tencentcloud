@@ -62,7 +62,7 @@ build {
 
   provisioner "shell-local" {
     inline = [
-      "echo image_id: ${data.tencentcloud-images.test_image.images[0].image_id}",
+      "echo image_id: ${data.st-tencentcloud-images.test_image.images[0].image_id}",
     ]
   }
 }
