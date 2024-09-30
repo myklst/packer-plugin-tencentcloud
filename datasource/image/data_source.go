@@ -57,7 +57,7 @@ func (d *Datasource) Configure(raws ...interface{}) error {
 
 	var errs *packer.MultiError
 	if d.config.SecretId == "" {
-		errs = packer.MultiErrorAppend(errs, fmt.Errorf("access_key is missing"))
+		errs = packer.MultiErrorAppend(errs, fmt.Errorf("secret_id is missing"))
 	}
 
 	if d.config.SecretKey == "" {
